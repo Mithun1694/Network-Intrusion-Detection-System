@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+<title>NIDS SOC Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+
+body {
+background: #0a0a0a;
+color: #00ff9c;
+font-family: monospace;
+padding: 20px;
+}
+
+h1 {
+color: #00ff9c;
+}
+
+.card {
+border: 1px solid #00ff9c;
+padding: 15px;
+margin: 10px;
+display: inline-block;
+width: 200px;
+text-align: center;
+}
+
+#alerts {
+margin-top: 20px;
+}
+
+.alert {
+border-bottom: 1px solid #00ff9c;
+padding: 5px;
+}
+
+canvas {
+background: #111;
+margin-top: 20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🔐 NIDS SOC Dashboard</h1>
+
+<!-- COUNTERS -->
+<div class="card">Port Scan<br><span id="port">0</span></div>
+<div class="card">SYN Flood<br><span id="syn">0</span></div>
+<div class="card">Brute Force<br><span id="brute">0</span></div>
+<div class="card">Suspicious IP<br><span id="susp">0</span></div>
+
+<h2>🔥 Top Attackers</h2>
+<div id="attackers"></div>
+
+<!-- GRAPH -->
+<h2>📊 Attack Graph</h2>
+<canvas id="chart"></canvas>
+
+<!-- TIMELINE -->
+<h2>📈 Attack Timeline</h2>
+<canvas id="timeline"></canvas>
+
+<!-- MAP -->
+<h2>🌍 Live Attack Map</h2>
+<div id="map" style="height:400px;"></div>
+
+<!-- ALERTS -->
+<h2>🚨 Recent Alerts</h2>
+<div id="alerts"></div>
+
+<script>
+
+// ======================
+// BAR CHART
+// ======================
+
+let chart = new Chart(document.getElementById('chart'), {
+    type: 'bar',
+    data: {
+        labels: ["Port Scan","SYN Flood","Brute Force","Suspicious IP"],
+        datasets: [{
+            label: "Attack Count",
+            data: [0,0,0,0]
+        }]
+    }
+});
+
+// ======================
+// TIMELINE CHART
+// ======================
+
+let timelineChart = new Chart(document.getElementById('timeline'), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: "Attacks Over Time",
+            data: []
+        }]
+    }
+});
+
+// ======================
+// MAP
+// ======================
+
+let map = L.map('map').setView([20,0],2);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+.addTo(map);
+
+let markers = [];
+
+// ======================
+// FETCH DATA
+// ======================
+
+async function fetchData(){
+
+    let res = await fetch('/data');
+    let data = await res.json();
+
+// TOP ATTACKERS
+let attackersDiv = document.getElementById("attackers");
+attackersDiv.innerHTML = "";
+
+data.top_attackers.forEach(a => {
+    attackersDiv.innerHTML += `
+        <div style="border:1px solid red; padding:10px; margin:5px;">
+            ${a[0]} → ${a[1]} attacks
+        </div>
+    `;
+});
+
+    // Update counters
+    document.getElementById("port").innerText = data.counts.PORT_SCAN;
+    document.getElementById("syn").innerText = data.counts.SYN_FLOOD;
+    document.getElementById("brute").innerText = data.counts.SSH_BRUTE_FORCE;
+    document.getElementById("susp").innerText = data.counts.SUSPICIOUS_IP_ACTIVITY;
+
+    // Update bar chart
+    chart.data.datasets[0].data = [
+        data.counts.PORT_SCAN,
+        data.counts.SYN_FLOOD,
+        data.counts.SSH_BRUTE_FORCE,
+        data.counts.SUSPICIOUS_IP_ACTIVITY
+    ];
+    chart.update();
+
+    // Timeline
+    let times = data.alerts.map(a => a.split("]")[0].replace("[",""));
+    timelineChart.data.labels = times;
+    timelineChart.data.datasets[0].data = times.map((_,i)=>i+1);
+    timelineChart.update();
+
+    // Alerts
+    let alertsDiv = document.getElementById("alerts");
+    alertsDiv.innerHTML = "";
+
+    data.alerts.forEach(a => {
+        alertsDiv.innerHTML += `<div class="alert">${a}</div>`;
+    });
+}
+
+// ======================
+// MAP DATA
+// ======================
+
+async function loadMap(){
+
+    let res = await fetch('/map');
+    let data = await res.json();
+
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    data.forEach(loc => {
+
+        let marker = L.marker([loc.lat, loc.lon])
+        .addTo(map)
+        .bindPopup(`Attack from ${loc.country} (${loc.ip})`);
+
+        markers.push(marker);
+    });
+}
+
+// ======================
+// AUTO UPDATE
+// ======================
+
+setInterval(fetchData, 2000);
+setInterval(loadMap, 5000);
+
+</script>
+
+</body>
+</html>
