@@ -1,4 +1,4 @@
-# 🔐 Network Intrusion Detection System (NIDS) with SOC Dashboard(Tested only for linux system)
+# 🔐 Network Intrusion Detection System (NIDS) with SOC Dashboard(only for linux system)
 
 A real-time Network Intrusion Detection System built using Python and Scapy, integrated with a SOC-style dashboard to monitor, detect, and visualize network threats.
 
