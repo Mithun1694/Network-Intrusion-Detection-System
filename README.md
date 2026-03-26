@@ -90,9 +90,14 @@ nmap -sS -T4 -p 1-200 scanme.nmap.org
 
 ## 📊 Sample Output
 
-```
-[2026-03-19 16:38:13] PORT_SCAN | Source: 208.95.112.1
-```
+<img width="1885" height="909" alt="image" src="https://github.com/user-attachments/assets/b94400c2-7006-487d-86ec-27db8b4e3157" />
+
+<img width="1886" height="906" alt="image" src="https://github.com/user-attachments/assets/c4e057fc-0d7c-4ec1-9a4d-3ab8c92f9ce4" />
+
+<img width="1638" height="786" alt="image" src="https://github.com/user-attachments/assets/29a4edbe-5ae0-4b3a-b0e8-0c58e74e7c5e" />
+
+[Sample log](alerts.log)
+
 
 ---
 
@@ -103,17 +108,7 @@ nmap -sS -T4 -p 1-200 scanme.nmap.org
 * Top attackers (by frequency)
 * Geolocation map of attackers
 
----
 
-## 📸 Screenshots
-
-*Add your screenshots here*
-
-```
-screenshots/dashboard.png
-screenshots/map.png
-screenshots/terminal.png
-```
 
 ---
 
