@@ -49,7 +49,7 @@ network-intrusion-detection-system/
 ## ⚙️ Setup
 
 ```bash
-git clone https://github.com/your-username/network-intrusion-detection-system.git
+git clone https://github.com/Mithun1694/Network-Intrusion-Detection-System.git
 cd network-intrusion-detection-system
 pip install -r requirements.txt
 ```
