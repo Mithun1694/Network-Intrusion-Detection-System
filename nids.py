@@ -9,8 +9,10 @@ import os
 # CONFIGURATION
 # ======================================
 
-INTERFACE = "eth0"
-LOG_FILE = "/home/kali/network-intrusion-detection-system/alerts.log"
+# Set NIDS_INTERFACE to your adapter name (e.g. eth0, wlan0, Wi-Fi).
+# Leave it unset to let Scapy choose the default interface.
+INTERFACE = os.environ.get("NIDS_INTERFACE") or None
+LOG_FILE = os.environ.get("NIDS_LOG_FILE", os.path.join(os.path.dirname(os.path.abspath(__file__)), "alerts.log"))
 
 PORT_SCAN_THRESHOLD = 15
 SYN_FLOOD_THRESHOLD = 10

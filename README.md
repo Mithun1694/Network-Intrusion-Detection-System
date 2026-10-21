@@ -1,126 +1,70 @@
-# 🔐 Network Intrusion Detection System (NIDS) with SOC Dashboard(only for linux system)
+# Network Intrusion Detection System (NIDS) + SOC Dashboard
 
-A real-time Network Intrusion Detection System built using Python and Scapy, integrated with a SOC-style dashboard to monitor, detect, and visualize network threats.
+A Python/Flask dashboard for visualizing alert records produced by the Scapy-based NIDS monitor.
 
----
+## Features
 
-## 🚀 Features
+- Dark SOC-style responsive dashboard
+- Port scan, SYN flood, SSH brute-force and unique suspicious-IP counters
+- Top source IPs and attack-type distribution
+- Timeline grouped by minute
+- Recent alert table with severity labels
+- Approximate public-IP geolocation map
+- Auto-refreshing dashboard data and `/health` endpoint
 
-* Real-time packet monitoring
-* Detection of:
+## Requirements
 
-  * Port Scanning
-  * SYN Flood Attacks
-  * SSH Brute Force Attempts
-* Live dashboard with:
+- Python 3.9+
+- Install packages with `python -m pip install -r requirements.txt`
+- Internet connection for the map tiles and chart libraries (CDN)
+- Administrator/root privileges may be required to sniff packets
 
-  * Attack counters
-  * Attack graph & timeline
-  * Top attackers panel
-* IP geolocation with attack map
-* Clean logging with timestamps
+## Run the dashboard
 
----
+Open PowerShell or a terminal in this folder:
 
-## 🛠️ Tech Stack
-
-* Python
-* Scapy
-* Flask
-* Chart.js
-* Leaflet.js
-
----
-
-## 📂 Project Structure
-
-```
-network-intrusion-detection-system/
-├── nids.py
-├── dashboard.py
-├── alerts.log
-├── requirements.txt
-└── templates/
-    └── index.html
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python dashboard.py
 ```
 
----
+On Windows, if PowerShell blocks activation, use `.\.venv\Scripts\python.exe dashboard.py` after installing packages into that environment, or open Command Prompt and run `.venv\Scripts\activate.bat`.
 
-## ⚙️ Setup
+Then open http://127.0.0.1:5000.
+
+The dashboard reads `alerts.log` beside `dashboard.py` by default. To use another log file, set `NIDS_LOG_FILE` before launching the dashboard.
+
+## Run the packet monitor
+
+Run this only on a network you own or have explicit permission to monitor. Packet capture may require administrator/root privileges.
+
+```powershell
+python nids.py
+```
+
+Set the adapter and log path through environment variables if needed:
+
+```powershell
+$env:NIDS_INTERFACE="Wi-Fi"
+$env:NIDS_LOG_FILE="$PWD\alerts.log"
+python nids.py
+```
+
+On Linux, for example:
 
 ```bash
-git clone https://github.com/Mithun1694/Network-Intrusion-Detection-System.git
-cd network-intrusion-detection-system
-pip install -r requirements.txt
+sudo env NIDS_INTERFACE=eth0 NIDS_LOG_FILE="$PWD/alerts.log" python3 nids.py
 ```
 
----
+If `NIDS_INTERFACE` is unset, Scapy chooses its default interface. Check available adapter names with Scapy or your operating system's network tools.
 
-## ▶️ Run
+## Notes and limitations
 
-Start NIDS:
-
-```bash
-sudo python3 nids.py
-```
-
-Start dashboard:
-
-```bash
-python3 dashboard.py
-```
-
-Open:
-
-```
-http://localhost:5000
-```
-
----
-
-## 🧪 Testing
-
-Run a safe port scan:
-
-```bash
-nmap -sS -T4 -p 1-200 scanme.nmap.org
-```
-
----
-
-## 📊 Sample Output
-
-<img width="1885" height="909" alt="image" src="https://github.com/user-attachments/assets/b94400c2-7006-487d-86ec-27db8b4e3157" />
-
-<img width="1886" height="906" alt="image" src="https://github.com/user-attachments/assets/c4e057fc-0d7c-4ec1-9a4d-3ab8c92f9ce4" />
-
-<img width="1638" height="786" alt="image" src="https://github.com/user-attachments/assets/29a4edbe-5ae0-4b3a-b0e8-0c58e74e7c5e" />
-
-[Sample log](alerts.log)
-
-
----
-
-## 🌍 Dashboard Includes
-
-* Real-time attack graph
-* Timeline visualization
-* Top attackers (by frequency)
-* Geolocation map of attackers
-
-
-
----
-
-## ⚠️ Notes
-
-* Private IPs (127.0.0.1, 10.x.x.x) are not geolocated
-* Use only authorized targets for testing
-* False positives are reduced using filtering logic
-
----
-
-## 👨‍💻 Author
-
-Mithun 
-Cybersecurity Enthusiast
+- This is a learning/demo project, not a production IDS.
+- The dashboard displays records from `alerts.log`; the counters are based on logged events, not independently verified attacks.
+- IP geolocation is approximate, may fail for private IP addresses, and uses an external lookup service. The map does not prove an attacker's physical location.
+- The timeline is grouped by minute from the log timestamps.
+- Detection thresholds are configured in `nids.py`. Validate and tune them for your environment.
+- IP blocking is disabled by default (`ENABLE_BLOCKING = False`). Do not enable automatic blocking without understanding the impact and testing in an authorized lab.
