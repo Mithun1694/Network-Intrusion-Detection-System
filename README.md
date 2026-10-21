@@ -60,6 +60,9 @@ sudo env NIDS_INTERFACE=eth0 NIDS_LOG_FILE="$PWD/alerts.log" python3 nids.py
 
 If `NIDS_INTERFACE` is unset, Scapy chooses its default interface. Check available adapter names with Scapy or your operating system's network tools.
 
+## 📸 Project Screenshots
+![NIDS SOC dashboard overview](screenshots/dashboard-overview.png)
+
 ## Notes and limitations
 
 - This is a learning/demo project, not a production IDS.
